@@ -58,10 +58,16 @@ function keypoints() {
   document.body.appendChild(t1);
 }
 
+let w = 320;
+let h = 240;
+let canvas;
+
 function setup() {
   video = createCapture(VIDEO);
-  createCanvas(320, 240);
-  video.size(width, height);
+  video.size(w, h);
+  video.elt.setAttribute('playsinline', '');
+  //video.hide();
+  canvas = createCanvas(w, h);
 
   // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(video, modelReady);
@@ -71,7 +77,6 @@ function setup() {
     poses = results;
   });
   // Hide the video element, and just show the canvas
-  //video.hide();
   keypoints();
 }
 
@@ -117,9 +122,9 @@ function drawKeypoints()  {
       }
     }
   }
-  lines = lines.length < 2000 ? lines : lines.slice(lines.length - 2000);
   lines.unshift("#" + count + " [" + Date.now() + "]");
   count++;
+  lines = lines.length < 2000 ? lines : lines.slice(0, 2000);
   //var len = key.value.length;
   //key.focus();
   key.innerHTML = lines.join('\n');
