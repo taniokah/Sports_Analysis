@@ -50,9 +50,17 @@ downloadBtn.addEventListener("click", () => {
   }, 100);
 });
 
+function keypoints() {
+  const t1 = document.createElement("textarea");
+  t1.setAttribute("id", "keypoints");
+  t1.setAttribute("cols", 60);
+  t1.setAttribute("rows", 15);
+  document.body.appendChild(t1);
+}
+
 function setup() {
-  createCanvas(640, 480);
   video = createCapture(VIDEO);
+  createCanvas(320, 240);
   video.size(width, height);
 
   // Create a new poseNet method with a single detection
@@ -63,7 +71,8 @@ function setup() {
     poses = results;
   });
   // Hide the video element, and just show the canvas
-  video.hide();
+  //video.hide();
+  keypoints();
 }
 
 function modelReady() {
@@ -71,6 +80,9 @@ function modelReady() {
 }
 
 function draw() {
+  //image(video, 0, 0, width, height);
+  clear();
+  tint(255, 126);
   image(video, 0, 0, width, height);
 
   // We can call both functions to draw all keypoints and the skeletons
@@ -78,8 +90,16 @@ function draw() {
   drawSkeleton();
 }
 
+let count = 0;
+
 // A function to draw ellipses over the detected keypoints
 function drawKeypoints()  {
+  if (poses.length <= 0) {
+    return;
+  }
+  let key = document.getElementById('keypoints');
+  let val = key.innerHTML;
+  let lines = val.split("\n");
   // Loop through all the poses detected
   for (let i = 0; i < poses.length; i++) {
     // For each pose detected, loop through all the keypoints
@@ -93,9 +113,17 @@ function drawKeypoints()  {
         noStroke();
         ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
         text(keypoint.part, keypoint.position.x + 10, keypoint.position.y - 10);
+        lines.unshift(keypoint.part + "," + keypoint.position.x + "," + keypoint.position.y);
       }
     }
   }
+  lines = lines.length < 2000 ? lines : lines.slice(lines.length - 2000);
+  lines.unshift("#" + count + " [" + Date.now() + "]");
+  count++;
+  //var len = key.value.length;
+  //key.focus();
+  key.innerHTML = lines.join('\n');
+  //key.setSelectionRange(len, len);
 }
 
 // A function to draw the skeletons
